@@ -1,14 +1,25 @@
-const http = require("http");
+const express = require("express");
+const cors = require("cors");
+const dotenv = require('dotenv');
 
-const hostname = "127.0.0.1";
-const port = 3000;
+dotenv.config();
+const app = express();
+const port = process.env.PORT || 5000;
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "text/plain");
-  res.end("Hello, World!");
+app.use(cors());
+app.use("/openai", require("./routes/openaiRoutes"));
+
+//create a json data
+const data = {
+  name: "John Doe",
+  age: 25,
+  email: "",
+};
+
+app.get("/", (req, res) => {
+  res.json(data);
 });
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}/`);
 });
