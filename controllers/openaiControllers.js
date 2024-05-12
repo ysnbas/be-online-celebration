@@ -6,11 +6,21 @@ const openai = new OpenAI({
   project: process.env.PROJECT_ID,
 });
 
+const client = require("../db/db");
+const db = client.db(process.env.DB_NAME);
+
 const generateImage = async (req, res) => {
+  const { prompt } = req.body;
+  if (!prompt) {
+    return res
+      .status(400)
+      .json({ success: false, error: "Prompt value is missing" });
+  }
   try {
     const response = await openai.images.generate({
       model: "dall-e-3",
-      prompt: "üzerinde Yasin yazan bir doğum günü pastası oluştur",
+      quality: "standard",
+      prompt,
       n: 1,
       size: "1024x1024",
     });
@@ -21,12 +31,15 @@ const generateImage = async (req, res) => {
       success: true,
       data: imageUrl,
     });
+
+    await db
+      .collection("Generated")
+      .insertOne({ prompt: prompt, generated_image_link: imageUrl });
   } catch (error) {
     if (error.response) {
-      console.log(error.response.status);
-      console.log(error.response.data);
+      res.json({ success: false, error: error.response.data });
     } else {
-      console.log(error.message);
+      res.json({ success: false, error: error.message });
     }
   }
 };
