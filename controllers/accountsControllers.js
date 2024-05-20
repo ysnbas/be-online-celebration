@@ -45,7 +45,7 @@ const login = async (req, res) => {
     if (!passwordMatch) {
       return res
         .status(400)
-        .json({ success: false, error: "Invalid credentials" });
+        .json({ success: false, error: "Password does not match" });
     }
     const token = jwt.sign({ email }, process.env.ACCESS_TOKEN_SECRET);
     res.status(200).json({ success: true, token: token });
