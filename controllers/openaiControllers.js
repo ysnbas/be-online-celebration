@@ -1,4 +1,5 @@
 const OpenAI = require("openai");
+const { ObjectId } = require("mongodb");
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -6,11 +7,8 @@ const openai = new OpenAI({
   project: process.env.PROJECT_ID,
 });
 
-const client = require("../db/db");
-const db = client.db(process.env.DB_NAME);
-
 const generateImage = async (req, res) => {
-  const { prompt } = req.body;
+  const { prompt, user_id } = req.body;
   if (!prompt) {
     return res
       .status(400)
@@ -19,7 +17,7 @@ const generateImage = async (req, res) => {
   try {
     const response = await openai.images.generate({
       model: "dall-e-3",
-      quality: "standard",
+      quality: "hd",
       prompt,
       n: 1,
       size: "1024x1024",
@@ -32,9 +30,13 @@ const generateImage = async (req, res) => {
       data: imageUrl,
     });
 
-    await db
-      .collection("Generated")
-      .insertOne({ prompt: prompt, generated_image_link: imageUrl });
+    const userObjectId = ObjectId(user_id);
+
+    await req.db.collection("Generated_Data").insertOne({
+      prompt: prompt,
+      generated_image_link: imageUrl,
+      user_id: userObjectId,
+    });
   } catch (error) {
     if (error.response) {
       res.json({ success: false, error: error.response.data });
