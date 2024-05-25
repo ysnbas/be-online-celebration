@@ -23,6 +23,7 @@ app.use("/openai", require("./routes/openaiRoutes"));
 app.use("/accounts", require("./routes/accountsRoutes"));
 app.use("/generated", require("./routes/generatedRoutes"));
 app.use("/prompt", require("./routes/promptRoutes"));
+app.use("/runwayml", require("./routes/runwaymlRoutes"));
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}/`);

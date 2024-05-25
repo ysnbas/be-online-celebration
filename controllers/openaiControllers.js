@@ -16,11 +16,11 @@ const generateImage = async (req, res) => {
   }
   try {
     const response = await openai.images.generate({
-      model: "dall-e-3",
-      quality: "hd",
+      model: "dall-e-2",
+      quality: "standard",
       prompt,
       n: 1,
-      size: "1024x1024",
+      size: "512x512",
     });
 
     const imageUrl = response.data[0].url;
